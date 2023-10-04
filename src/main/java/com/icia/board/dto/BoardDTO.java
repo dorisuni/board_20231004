@@ -1,11 +1,13 @@
 package com.icia.board.dto;
 
 import com.icia.board.entity.BoardEntity;
+import com.icia.board.util.UtilClass;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
@@ -16,7 +18,7 @@ public class BoardDTO {
     private String boardPass;
     private String boardTitle;
     private String boardContents;
-    private LocalDateTime createdAt;
+    private String createdAt;
     private int boardHits;
 
     public static BoardDTO toDTO(BoardEntity boardEntity) {
@@ -27,7 +29,12 @@ public class BoardDTO {
         boardDTO.setBoardPass(boardEntity.getBoardPass());
         boardDTO.setBoardContents(boardEntity.getBoardContents());
         boardDTO.setBoardHits(boardEntity.getBoardHits());
-        boardDTO.setCreatedAt(boardEntity.getCreatedAt());
+        boardDTO.setCreatedAt(UtilClass.dateTimeFormat(boardEntity.getCreatedAt()));
+
+//        LocalDateTime createdAt = boardEntity.getCreatedAt();
+//        String result = UtilClass.dateTimeFormat(createdAt);
+//        boardDTO.setCreatedAt(result);
+
         return boardDTO;
     }
 }
