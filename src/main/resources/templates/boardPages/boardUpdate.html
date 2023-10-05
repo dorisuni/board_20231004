@@ -23,4 +23,44 @@
 <div th:replace="~{component/footer :: footer}"></div>
 
 </body>
+<script th:inline="javascript">
+    const board_update = () => {
+        const id = document.querySelector('[name="id"]').value;
+        const boardWriter = document.querySelector('[name="boardWriter"]').value;
+        const boardTitle = document.querySelector('[name="boardTitle"]').value;
+        const boardPass = document.querySelector('[name="boardPass"]').value;
+        const boardHits = document.querySelector('[name="boardHits"]').value;
+        const boardContents = document.querySelector('[name="boardContents"]').value;
+        axios({
+            method: "put",
+            url: `/board/${id}`,
+            data: {
+                id: id,
+                boardTitle: boardTitle,
+                boardWriter: boardWriter,
+                boardContents: boardContents,
+                boardHits: boardHits,
+                boardPass: boardPass
+            }
+        }).then(res => {
+            location.href = `/board/${id}`;
+        }).catch(err => {
+            alert("수정 실패!");
+        });
+
+    }
+</script>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+

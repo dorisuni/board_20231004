@@ -64,6 +64,12 @@ public class BoardController {
         return "boardPages/boardUpdate";
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity update(@RequestBody BoardDTO boardDTO) {
+        boardService.update(boardDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }
 
 
