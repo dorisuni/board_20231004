@@ -57,6 +57,13 @@ public class BoardController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @GetMapping("/update/{id}")
+    public String update(@PathVariable("id") Long id, Model model) {
+        BoardDTO boardDTO = boardService.findById(id);
+        model.addAttribute("board", boardDTO);
+        return "boardPages/boardUpdate";
+    }
+
 }
 
 
