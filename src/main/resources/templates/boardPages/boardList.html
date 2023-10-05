@@ -43,6 +43,7 @@
                 <li th:class="${boardList.first} ? 'disabled'" class="page-item">
                     <!--boardList.first: isFirst()
                         boardList.number: getNumber()-->
+                    <!-- 현재 페이지가 첫페이지라면 링크값을 #으로 아니면 /board?page=number 로  -->
                     <a class="page-link" th:href="${boardList.first} ? '#' : @{/board(page=${boardList.number})}">
                         <!-- 사용자 3페이지, number 2 /board?page=2 -->
                         <span><</span> <!-- < -->

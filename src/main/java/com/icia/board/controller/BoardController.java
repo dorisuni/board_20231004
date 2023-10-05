@@ -49,10 +49,10 @@ public class BoardController {
         int blockLimit = 3;
         int startPage = (((int) (Math.ceil((double) page / blockLimit))) - 1) * blockLimit + 1;
         int endPage = ((startPage + blockLimit - 1) < boardDTOList.getTotalPages()) ? startPage + blockLimit - 1 : boardDTOList.getTotalPages();
-//        if ((startPage + blockLimit - 1) < boardDTOS.getTotalPages()) {
+//        if ((startPage + blockLimit - 1) < boardDTOList.getTotalPages()) {
 //            endPage = startPage + blockLimit - 1;
 //        } else {
-//            endPage = boardDTOS.getTotalPages();
+//            endPage = boardDTOList.getTotalPages();
 //        }
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
