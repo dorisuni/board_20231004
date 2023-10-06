@@ -136,11 +136,11 @@ public class BoardTest {
         Optional<BoardEntity> boardEntityOptional = boardRepository.findById(54L);
         BoardEntity boardEntity = boardEntityOptional.get();
         // BoardEntity에서 BoardFileEntity 조회
-        List<BoardFileEntity> boardFileEntityList = boardEntity.getBoardFileEntityList();
-        boardFileEntityList.forEach(boardFileEntity -> {
-            System.out.println(boardFileEntity.getOriginalFileName());
-            System.out.println(boardFileEntity.getStoredFileName());
-        });
+//        List<BoardFileEntity> boardFileEntityList = boardEntity.getBoardFileEntityList();
+////        boardFileEntityList.forEach(boardFileEntity -> {
+////            System.out.println(boardFileEntity.getOriginalFileName());
+////            System.out.println(boardFileEntity.getStoredFileName());
+////        });
     }
 
 }
