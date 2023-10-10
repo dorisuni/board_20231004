@@ -3,8 +3,10 @@ package com.icia.board.service;
 import com.icia.board.dto.BoardDTO;
 import com.icia.board.entity.BoardEntity;
 import com.icia.board.entity.BoardFileEntity;
+import com.icia.board.entity.MemberEntity;
 import com.icia.board.repository.BoardFileRepository;
 import com.icia.board.repository.BoardRepository;
+import com.icia.board.repository.MemberRepository;
 import com.icia.board.util.UtilClass;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,15 +28,17 @@ import java.util.Optional;
 public class BoardService {
     private final BoardRepository boardRepository;
     private final BoardFileRepository boardFileRepository;
+    private final MemberRepository memberRepository;
 
     public Long save(BoardDTO boardDTO) throws IOException {
+        MemberEntity memberEntity = memberRepository.findByMemberEmail(boardDTO.getBoardWriter()).orElseThrow(() -> new NoSuchElementException());
         if (boardDTO.getBoardFile().get(0).isEmpty()) {
             // 첨부파일 없음
-            BoardEntity boardEntity = BoardEntity.toSaveEntity(boardDTO);
+            BoardEntity boardEntity = BoardEntity.toSaveEntity(memberEntity, boardDTO);
             return boardRepository.save(boardEntity).getId();
         } else {
             // 첨부파일 있음
-            BoardEntity boardEntity = BoardEntity.toSaveEntityWithFile(boardDTO);
+            BoardEntity boardEntity = BoardEntity.toSaveEntityWithFile(memberEntity, boardDTO);
             // 게시글 저장처리 후 저장한 엔티티 가져옴
             BoardEntity savedEntity = boardRepository.save(boardEntity);
             // 파일 이름 처리, 파일 로컬에 저장 등
@@ -73,7 +77,6 @@ public class BoardService {
                 boardEntities = boardRepository.findByBoardWriterContaining(q, PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
             }
         }
-
         Page<BoardDTO> boardList = boardEntities.map(boardEntity ->
                 BoardDTO.builder()
                         .id(boardEntity.getId())
@@ -84,12 +87,6 @@ public class BoardService {
                         .build());
         return boardList;
     }
-
-    /**
-     * 서비스 클래스 메서드에서 @Transactional 붙이는 경우
-     * 1. jpql로 작성한 메서드 호출할 때
-     * 2. 부모엔티티에서 자식엔티티를 바로 호출할 때
-     */
 
     @Transactional
     public void increaseHits(Long id) {
@@ -107,7 +104,8 @@ public class BoardService {
     }
 
     public void update(BoardDTO boardDTO) {
-        BoardEntity boardEntity = BoardEntity.toUpdateEntity(boardDTO);
+        MemberEntity memberEntity = memberRepository.findByMemberEmail(boardDTO.getBoardWriter()).orElseThrow(() -> new NoSuchElementException());
+        BoardEntity boardEntity = BoardEntity.toUpdateEntity(memberEntity, boardDTO);
         boardRepository.save(boardEntity);
     }
 }

@@ -43,10 +43,8 @@
     </table>
     <div id="btn-area">
         <button class="btn btn-primary" onclick="list_fn()">목록</button>
-        <!-- 수정 또는 삭제 버튼을 클릭하면 비밀번호를 입력하는 input 창이 노출되고
-            비밀번호 일치하면 수정페이지로 이동 또는 삭제처리를 진행함. -->
-        <button class="btn btn-warning" onclick="req_fn('update')">수정</button>
-        <button class="btn btn-danger" onclick="req_fn('delete')">삭제</button>
+        <button th:if="${session.loginEmail == board.boardWriter}" class="btn btn-warning" onclick="update_req()">수정</button>
+        <button th:if="${session.loginEmail == board.boardWriter} or ${'admin' == session.loginEmail}" class="btn btn-danger" onclick="delete_req()">삭제</button>
     </div>
 
     <div id="pass-check" class="mt-3">
@@ -55,7 +53,7 @@
 
     <div class="row g-2 mt-5" id="comment-write">
         <div class="col">
-            <input type="text" id="comment-writer" class="form-control" placeholder="작성자">
+            <input type="text" id="comment-writer" th:value="${session.loginEmail}" class="form-control" placeholder="작성자" readonly>
         </div>
         <div class="col-9">
             <input type="text" id="comment-contents" class="form-control" placeholder="내용">
@@ -73,12 +71,19 @@
                 <tr>
                     <th>writer</th>
                     <th>contents</th>
-                    <th>date</th>
+                    <th colspan="3">date</th>
                 </tr>
                 <tr th:each="comment: ${commentList}">
                     <td th:text="${comment.commentWriter}"></td>
                     <td th:text="${comment.commentContents}"></td>
                     <td th:text="${comment.createdAt}"></td>
+                    <td>
+                        <i th:if="${comment.isLike == 0}" class="bi bi-suit-heart"
+                           th:onclick="like_fn([[${comment.id}]])"></i>
+                        <i th:unless="${comment.isLike == 0}" class="bi bi-suit-heart-fill"
+                           th:onclick="unlike_fn([[${comment.id}]])"></i>
+                        <span class="ms-1" th:text="${comment.likeCount}"></span>
+                    </td>
                 </tr>
             </table>
         </div>
@@ -97,14 +102,20 @@
             "            <tr>\n" +
             "                <th>writer</th>\n" +
             "                <th>contents</th>\n" +
-            "                <th>date</th>\n" +
+            "                <th colspan=\"3\">date</th>\n" +
             "            </tr>";
         for (let i in commentList) {
             output += "<tr>\n" +
                 "                <td>" + commentList[i].commentWriter + "</td>\n" +
                 "                <td>" + commentList[i].commentContents + "</td>\n" +
-                "                <td>" + commentList[i].createdAt + "</td>\n" +
-                "            </tr>";
+                "                <td>" + commentList[i].createdAt + "</td>\n";
+            if (commentList[i].isLike == 0) {
+                output += "<td>" + "<i class=\"bi bi-suit-heart\" onclick=\"like_fn('" + commentList[i].id + "')\"></i>";
+            } else {
+                output += "<td>" + "<i class=\"bi bi-suit-heart-fill\" onclick=\"unlike_fn('" + commentList[i].id + "')\"></i>";
+            }
+            output += "<span class='ms-1'>" + commentList[i].likeCount + "</span>";
+            output += "</td></tr>";
         }
         output += "</table>";
         resultArea.innerHTML = output;
@@ -133,6 +144,43 @@
         });
     }
 
+    const unlike_fn = (commentId) => {
+        const memberId = [[${session.loginId}]];
+        const boardId = [[${board.id}]];
+        axios({
+            method: "post",
+            url: "/comment/unlike",
+            data: {
+                memberId: memberId,
+                commentId: commentId,
+                boardId: boardId
+            }
+        }).then(res => {
+            comment_list(res.data);
+        }).catch(err => {
+            console.log("unlike 실패");
+        });
+    }
+
+    const like_fn = (commentId) => {
+        const memberId = [[${session.loginId}]];
+        const boardId = [[${board.id}]];
+        axios({
+            method: "post",
+            url: "/comment/like",
+            data: {
+                memberId: memberId,
+                commentId: commentId,
+                boardId: boardId
+            }
+        }).then(res => {
+            console.log("res.data: ", res.data);
+            comment_list(res.data);
+        }).catch(err => {
+            console.log("unlike 실패");
+        });
+    }
+
     const list_fn = () => {
         const page = [[${page}]]
         const type = [[${type}]]
@@ -140,33 +188,14 @@
         location.href = `/board?page=${page}&type=${type}&q=${q}`;
     }
 
-    const req_fn = (type) => {
-        document.querySelector("#pass-check").innerHTML =
-            `<input type="text" id="board-pass" placeholder="비밀번호">
-                <input type="button" onclick="pass_check('${type}')" value="확인">`;
+    const update_req = () => {
+        const id = [[${board.id}]];
+        location.href = `/board/update/${id}`;
     }
 
-    const pass_check = (type) => {
-        const passInput = document.getElementById("board-pass").value;
-        const passDB = [[${board.boardPass}]];
+    const delete_req = () => {
         const id = [[${board.id}]];
-        if (passInput == passDB) {
-            if (type == "update") {
-                location.href = `/board/update/${id}`;
-            } else if (type == "delete") {
-                // location.href = `/board/delete/${id}`;
-                axios({
-                    method: "delete",
-                    url: `/board/${id}`
-                }).then(res => {
-                    location.href = "/board";
-                }).catch(err => {
-                    alert("삭제 실패!");
-                });
-            }
-        } else {
-            alert("비밀번호가 일치하지 않습니다!");
-        }
+        location.href = `/board/delete/${id}`;
     }
 </script>
 </html>

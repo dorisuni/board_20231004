@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -70,15 +71,17 @@ public class BoardController {
     public String findById(@PathVariable("id") Long id, Model model,
                            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
                            @RequestParam(value = "type", required = false, defaultValue = "boardTitle") String type,
-                           @RequestParam(value = "q", required = false, defaultValue = "") String q) {
+                           @RequestParam(value = "q", required = false, defaultValue = "") String q,
+                           HttpSession session) {
         boardService.increaseHits(id);
         model.addAttribute("page", page);
         model.addAttribute("type", type);
         model.addAttribute("q", q);
+        Long memberId = (Long) session.getAttribute("loginId");
         try {
             BoardDTO boardDTO = boardService.findById(id);
             model.addAttribute("board", boardDTO);
-            List<CommentDTO> commentDTOList = commentService.findAll(id);
+            List<CommentDTO> commentDTOList = commentService.findAll(memberId, id);
             if (commentDTOList.size() > 0) {
                 model.addAttribute("commentList", commentDTOList);
             } else {

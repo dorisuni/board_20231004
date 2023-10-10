@@ -20,7 +20,6 @@ import java.util.List;
 public class BoardDTO {
     private Long id;
     private String boardWriter;
-    private String boardPass;
     private String boardTitle;
     private String boardContents;
     private String createdAt;
@@ -36,7 +35,6 @@ public class BoardDTO {
         boardDTO.setId(boardEntity.getId());
         boardDTO.setBoardWriter(boardEntity.getBoardWriter());
         boardDTO.setBoardTitle(boardEntity.getBoardTitle());
-        boardDTO.setBoardPass(boardEntity.getBoardPass());
         boardDTO.setBoardContents(boardEntity.getBoardContents());
         boardDTO.setBoardHits(boardEntity.getBoardHits());
         boardDTO.setCreatedAt(UtilClass.dateTimeFormat(boardEntity.getCreatedAt()));
